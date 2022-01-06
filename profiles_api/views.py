@@ -1,9 +1,10 @@
-from rest_framework.views import APIView
-from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
 
-from profiles_api import serializers
+from profiles_api import models, serializers, permissions
 
 
 class HelloApiView(APIView):
@@ -76,16 +77,24 @@ class HelloViewSet(ViewSet):
 
     def retrieve(self, request, pk=None):
         """Handle getting an object by its ID"""
-        return Response({'method': 'retrieve'})
+        return Response({'method': 'GET'})
 
     def update(self, request, pk=None):
         """Handle updating an object"""
-        return Response({'method': 'update'})
+        return Response({'method': 'PUT'})
 
     def partial_update(self, request, pk=None):
         """Handle updating part of an object"""
-        return Response({'method': 'partial_update'})
+        return Response({'method': 'PATCH'})
 
     def destroy(self, request, pk=None):
         """Handle removing an object"""
-        return Response({'method': 'destroy'})
+        return Response({'method': 'DELETE'})
+
+
+class UserProfileViewSet(ModelViewSet):
+    """Handle creating and updating profiles"""
+    serializer_class = serializers.UserProfileSerializer
+    queryset = models.UserProfile.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.UpdateOwnProfile,)
